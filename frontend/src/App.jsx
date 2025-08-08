@@ -16,6 +16,8 @@ import GuideModePage from './pages/GuideModePage';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -24,43 +26,47 @@ function App() {
         <ChatProvider>
           <LocationProvider>
             <Router>
-              <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-                <Routes>
-                  {/* Public Routes */}
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/signup" element={<SignupPage />} />
-                  <Route path="/onboarding" element={<OnboardingPage />} />
-                  
-                  {/* Protected Routes */}
-                  <Route 
-                    path="/chat" 
-                    element={
-                      <ProtectedRoute>
-                        <ChatPage />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/dashboard" 
-                    element={
-                      <ProtectedRoute>
-                        <DashboardPage />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/guide" 
-                    element={
-                      <ProtectedRoute>
-                        <GuideModePage />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  
-                  {/* Fallback */}
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
+              <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
+                <Navbar />
+                <div className="flex-1">
+                  <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/onboarding" element={<OnboardingPage />} />
+                    
+                    {/* Protected Routes */}
+                    <Route 
+                      path="/chat" 
+                      element={
+                        <ProtectedRoute>
+                          <ChatPage />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/dashboard" 
+                      element={
+                        <ProtectedRoute>
+                          <DashboardPage />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/guide" 
+                      element={
+                        <ProtectedRoute>
+                          <GuideModePage />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    
+                    {/* Fallback */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </div>
+                <Footer />
                 
                 <Toaster 
                   position="top-right"

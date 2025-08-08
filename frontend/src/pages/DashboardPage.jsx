@@ -4,6 +4,20 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useChat } from '../context/ChatContext';
 import { useLocation } from '../context/LocationContext';
+// Modular dashboard components
+import TripOverview from '../features/Dashboard/Overview/TripOverview';
+import WeatherWidget from '../features/Dashboard/Overview/WeatherWidget';
+import UpcomingEventsWidget from '../features/Dashboard/Overview/UpcomingEventsWidget';
+import DayPlanner from '../features/Dashboard/Planner/DayPlanner';
+import TranslatorBox from '../features/Dashboard/Translator/TranslatorBox';
+import BudgetChart from '../features/Dashboard/BudgetPlanner/BudgetChart';
+import BudgetForm from '../features/Dashboard/BudgetPlanner/BudgetForm';
+import ScenarioSelector from '../features/Dashboard/WhatIfScenarios/ScenarioSelector';
+import ScenarioResult from '../features/Dashboard/WhatIfScenarios/ScenarioResult';
+import SOSButton from '../features/Dashboard/SOS/SOSButton';
+import SOSContacts from '../features/Dashboard/SOS/SOSContacts';
+import TripSummary from '../features/Dashboard/Summary/TripSummary';
+import DownloadSummaryButton from '../features/Dashboard/Summary/DownloadSummaryButton';
 import { 
   MapPin, 
   Calendar, 
@@ -94,192 +108,56 @@ const DashboardPage = () => {
 
   const renderOverview = () => (
     <div className="space-y-6">
-      {/* Trip Status */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Days Left</h3>
-            <Clock className="w-6 h-6 text-purple-400" />
-          </div>
-          <div className="text-3xl font-bold text-white mb-2">5</div>
-          <p className="text-slate-400 text-sm">Return on Dec 25, 2024</p>
-        </motion.div>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <TripOverview
+          daysLeft={5}
+          returnDate="Dec 25, 2024"
+          location={currentLocation ? `${currentLocation.latitude.toFixed(4)}, ${currentLocation.longitude.toFixed(4)}` : 'Getting location...'}
+          travelers={familyMembers.length + 1}
+        />
+      </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Current Location</h3>
-            <MapPin className="w-6 h-6 text-blue-400" />
-          </div>
-          <div className="text-lg font-semibold text-white mb-2">Dubai, UAE</div>
-          <p className="text-slate-400 text-sm">
-            {currentLocation ? `${currentLocation.latitude.toFixed(4)}, ${currentLocation.longitude.toFixed(4)}` : 'Getting location...'}
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Group Size</h3>
-            <Users className="w-6 h-6 text-green-400" />
-          </div>
-          <div className="text-3xl font-bold text-white mb-2">{familyMembers.length + 1}</div>
-          <p className="text-slate-400 text-sm">Travelers</p>
-        </motion.div>
-      </div>
-
-      {/* Weather Widget */}
       {weather && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Weather</h3>
-            <div className="flex items-center space-x-2">
-              {weather.icon === 'sun' ? <Sun className="w-6 h-6 text-yellow-400" /> : <Moon className="w-6 h-6 text-blue-400" />}
-              <span className="text-white font-semibold">{weather.temperature}°C</span>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="flex items-center space-x-2">
-              <Thermometer className="w-4 h-4 text-red-400" />
-              <span className="text-slate-300 text-sm">{weather.temperature}°C</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Droplets className="w-4 h-4 text-blue-400" />
-              <span className="text-slate-300 text-sm">{weather.humidity}%</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Wind className="w-4 h-4 text-gray-400" />
-              <span className="text-slate-300 text-sm">{weather.windSpeed} km/h</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Sun className="w-4 h-4 text-yellow-400" />
-              <span className="text-slate-300 text-sm">{weather.condition}</span>
-            </div>
-          </div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <WeatherWidget weather={weather} />
         </motion.div>
       )}
 
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6"
-      >
-        <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: 'Book Activity', icon: <Activity className="w-5 h-5" />, color: 'text-purple-400' },
-            { label: 'Find Restaurant', icon: <Utensils className="w-5 h-5" />, color: 'text-orange-400' },
-            { label: 'Take Photo', icon: <Camera className="w-5 h-5" />, color: 'text-pink-400' },
-            { label: 'Shopping', icon: <ShoppingBag className="w-5 h-5" />, color: 'text-green-400' }
-          ].map((action, index) => (
-            <button
-              key={index}
-              className="flex flex-col items-center space-y-2 p-4 rounded-lg bg-slate-700/30 hover:bg-slate-700/50 transition-colors"
-            >
-              <div className={action.color}>{action.icon}</div>
-              <span className="text-sm text-slate-300">{action.label}</span>
-            </button>
-          ))}
-        </div>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <UpcomingEventsWidget events={[{ title: 'Desert Safari', time: 'Today 3:00 PM' }, { title: 'Dinner & Show', time: '7:00 PM' }]} />
       </motion.div>
     </div>
   );
 
   const renderTripPlanner = () => (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6"
-      >
+      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Today's Itinerary</h3>
-        <div className="space-y-4">
-          {[
-            { time: '09:00', activity: 'Breakfast at Hotel', location: 'Hotel Restaurant', icon: <Utensils className="w-4 h-4" /> },
-            { time: '10:30', activity: 'Visit Burj Khalifa', location: 'Downtown Dubai', icon: <Camera className="w-4 h-4" /> },
-            { time: '13:00', activity: 'Lunch at Mall', location: 'Dubai Mall', icon: <Utensils className="w-4 h-4" /> },
-            { time: '15:00', activity: 'Desert Safari', location: 'Dubai Desert', icon: <Activity className="w-4 h-4" /> },
-            { time: '19:00', activity: 'Dinner & Show', location: 'Dubai Opera', icon: <Activity className="w-4 h-4" /> }
-          ].map((item, index) => (
-            <div key={index} className="flex items-center space-x-4 p-4 rounded-lg bg-slate-700/30">
-              <div className="text-purple-400 font-semibold min-w-[60px]">{item.time}</div>
-              <div className="text-purple-400">{item.icon}</div>
-              <div className="flex-1">
-                <div className="text-white font-medium">{item.activity}</div>
-                <div className="text-slate-400 text-sm">{item.location}</div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400" />
-            </div>
-          ))}
-        </div>
-      </motion.div>
+        <DayPlanner
+          items={[
+            { time: '09:00', activity: 'Breakfast at Hotel', location: 'Hotel Restaurant' },
+            { time: '10:30', activity: 'Visit Burj Khalifa', location: 'Downtown Dubai' },
+            { time: '13:00', activity: 'Lunch at Mall', location: 'Dubai Mall' },
+            { time: '15:00', activity: 'Desert Safari', location: 'Dubai Desert' },
+            { time: '19:00', activity: 'Dinner & Show', location: 'Dubai Opera' }
+          ]}
+        />
+      </div>
     </div>
   );
 
   const renderTranslator = () => (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6"
-      >
+      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Language Translator</h3>
-        <div className="space-y-4">
-          <div className="flex space-x-4">
-            <select className="flex-1 px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white">
-              <option value="en">English</option>
-              <option value="ar">Arabic</option>
-              <option value="hi">Hindi</option>
-              <option value="es">Spanish</option>
-            </select>
-            <button className="px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white">
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <select className="flex-1 px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white">
-              <option value="ar">Arabic</option>
-              <option value="en">English</option>
-              <option value="hi">Hindi</option>
-              <option value="es">Spanish</option>
-            </select>
-          </div>
-          <textarea
-            placeholder="Enter text to translate..."
-            className="w-full h-32 px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 resize-none"
-          />
-          <button className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all">
-            Translate
-          </button>
-        </div>
-      </motion.div>
+        <TranslatorBox />
+      </div>
     </div>
   );
 
   const renderBudget = () => (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6"
-      >
+      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Budget Overview</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div className="text-center">
@@ -295,117 +173,51 @@ const DashboardPage = () => {
             <div className="text-slate-400 text-sm">Remaining</div>
           </div>
         </div>
-        <div className="space-y-3">
-          {Object.entries(budget.categories).map(([category, amount]) => (
-            <div key={category} className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
-                <span className="text-slate-300 capitalize">{category}</span>
-              </div>
-              <span className="text-white font-semibold">{amount.toLocaleString()}</span>
-            </div>
-          ))}
+        <BudgetChart categories={budget.categories} />
+        <div className="mt-6">
+          <h4 className="text-white font-medium mb-2">Adjust Budget</h4>
+          <BudgetForm initial={budget.categories} onChange={(next)=>{
+            setBudget((b)=> ({ ...b, categories: next, spent: Object.values(next).reduce((a,c)=>a+c,0), remaining: b.total - Object.values(next).reduce((a,c)=>a+c,0) }))
+          }} />
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 
   const renderScenarios = () => (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6"
-      >
+      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
         <h3 className="text-lg font-semibold text-white mb-4">What If Scenarios</h3>
-        <div className="space-y-4">
-          {[
-            { scenario: 'Flight gets delayed', action: 'Alternative routes', icon: <Plane className="w-5 h-5" /> },
-            { scenario: 'Hotel overbooked', action: 'Nearby alternatives', icon: <Hotel className="w-5 h-5" /> },
-            { scenario: 'Weather changes', action: 'Indoor activities', icon: <Thermometer className="w-5 h-5" /> },
-            { scenario: 'Budget exceeded', action: 'Cost-cutting options', icon: <CreditCard className="w-5 h-5" /> }
-          ].map((item, index) => (
-            <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-slate-700/30">
-              <div className="flex items-center space-x-3">
-                <div className="text-purple-400">{item.icon}</div>
-                <div>
-                  <div className="text-white font-medium">{item.scenario}</div>
-                  <div className="text-slate-400 text-sm">{item.action}</div>
-                </div>
-              </div>
-              <button className="px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-lg text-purple-400 hover:bg-purple-500/30 transition-colors">
-                View
-              </button>
-            </div>
-          ))}
+        <ScenarioSelector onSelect={(s)=> setScenario({ title: s, actions: defaultScenarioActions[s] || [] })} />
+        <div className="mt-4">
+          <ScenarioResult title={scenario.title} actions={scenario.actions} />
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 
   const renderSOS = () => (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6"
-      >
-        <h3 className="text-lg font-semibold text-white mb-4">Emergency Contacts</h3>
-        <div className="space-y-4">
-          {[
-            { name: 'Police', number: '999', icon: <Shield className="w-5 h-5" />, color: 'text-blue-400' },
-            { name: 'Ambulance', number: '998', icon: <Phone className="w-5 h-5" />, color: 'text-red-400' },
-            { name: 'Fire Department', number: '997', icon: <AlertTriangle className="w-5 h-5" />, color: 'text-orange-400' },
-            { name: 'Hotel Front Desk', number: '+971-4-123-4567', icon: <Hotel className="w-5 h-5" />, color: 'text-green-400' }
-          ].map((contact, index) => (
-            <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-slate-700/30">
-              <div className="flex items-center space-x-3">
-                <div className={contact.color}>{contact.icon}</div>
-                <div>
-                  <div className="text-white font-medium">{contact.name}</div>
-                  <div className="text-slate-400 text-sm">{contact.number}</div>
-                </div>
-              </div>
-              <button className="px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 hover:bg-red-500/30 transition-colors">
-                Call
-              </button>
-            </div>
-          ))}
-        </div>
-      </motion.div>
+      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 space-y-4">
+        <h3 className="text-lg font-semibold text-white">Emergency</h3>
+        <SOSButton onClick={()=>{/* wire sos */}} />
+        <SOSContacts contacts={[
+          { name: 'Police', number: '999' },
+          { name: 'Ambulance', number: '998' },
+          { name: 'Fire Department', number: '997' },
+          { name: 'Hotel Front Desk', number: '+971-4-123-4567' },
+        ]} />
+      </div>
     </div>
   );
 
   const renderSummary = () => (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6"
-      >
-        <h3 className="text-lg font-semibold text-white mb-4">Trip Summary</h3>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 rounded-lg bg-slate-700/30">
-              <div className="text-2xl font-bold text-white">12</div>
-              <div className="text-slate-400 text-sm">Places Visited</div>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-slate-700/30">
-              <div className="text-2xl font-bold text-white">45</div>
-              <div className="text-slate-400 text-sm">Photos Taken</div>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <h4 className="text-white font-medium">Highlights</h4>
-            <ul className="space-y-1 text-slate-300 text-sm">
-              <li>• Burj Khalifa - World's tallest building</li>
-              <li>• Desert Safari - Adventure experience</li>
-              <li>• Dubai Mall - Shopping paradise</li>
-              <li>• Palm Jumeirah - Iconic landmark</li>
-            </ul>
-          </div>
-        </div>
-      </motion.div>
+      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 space-y-4">
+        <h3 className="text-lg font-semibold text-white">Trip Summary</h3>
+        <TripSummary places={[ 'Burj Khalifa', 'Desert Safari', 'Dubai Mall', 'Palm Jumeirah' ]} expenses={budget.categories} />
+        <DownloadSummaryButton data={{ places: [ 'Burj Khalifa', 'Desert Safari' ], expenses: budget.categories }} />
+      </div>
     </div>
   );
 
