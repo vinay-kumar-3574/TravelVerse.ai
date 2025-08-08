@@ -1,6 +1,6 @@
-const TripPlanner = require('../../ai-agent/pipelines/tripPlanner');
-const BookingAgent = require('../../ai-agent/pipelines/bookingAgent');
-const { createChatCompletion } = require('../../ai-agent/ai-config');
+const TripPlanner = require('../../AI-agent/pipelines/tripPlanner');
+const BookingAgent = require('../../AI-agent/pipelines/bookingAgent');
+const { createChatCompletion } = require('../../AI-agent/ai-config');
 const Chat = require('../models/Chat');
 const Trip = require('../models/Trip');
 
@@ -13,8 +13,9 @@ class AIController {
   // Process chat message
   async processChatMessage(req, res) {
     try {
-      const { message, userId, tripId } = req.body;
+      const { message, userId: bodyUserId, tripId } = req.body;
 
+      const userId = req.user?.id || bodyUserId;
       if (!message || !userId) {
         return res.status(400).json({
           success: false,
