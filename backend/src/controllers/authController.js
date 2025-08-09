@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-
+require('dotenv').config();
 // Generate JWT token
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
@@ -30,6 +30,14 @@ const register = async (req, res) => {
     });
 
     await user.save();
+
+    // Console log successful registration
+    console.log('✅ User registered successfully:');
+    console.log('📧 Email:', user.email);
+    console.log('👤 Full Name:', user.fullName);
+    console.log('🆔 User ID:', user._id);
+    console.log('📅 Created At:', user.createdAt);
+    console.log('🔒 Onboarded:', user.isOnboarded);
 
     // Generate token
     const token = generateToken(user._id);
@@ -122,6 +130,17 @@ const completeOnboarding = async (req, res) => {
       });
     }
 
+    // Validate required onboarding fields
+    const requiredFields = ['dateOfBirth', 'gender', 'nationality', 'contactNumber'];
+    const missingFields = requiredFields.filter(field => !onboardingData[field]);
+    
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing required fields: ${missingFields.join(', ')}`
+      });
+    }
+
     // Update user with onboarding data
     Object.assign(user, onboardingData, {
       isOnboarded: true,
@@ -130,6 +149,13 @@ const completeOnboarding = async (req, res) => {
     });
 
     await user.save();
+
+    // Console log successful onboarding
+    console.log('✅ User onboarding completed:');
+    console.log('👤 User:', user.fullName, '(' + user.email + ')');
+    console.log('📞 Contact:', user.contactNumber);
+    console.log('🌍 Nationality:', user.nationality);
+    console.log('👥 Gender:', user.gender);
 
     res.status(200).json({
       success: true,

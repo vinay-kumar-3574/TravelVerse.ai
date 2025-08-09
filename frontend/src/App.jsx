@@ -18,6 +18,13 @@ import GuideModePage from './pages/GuideModePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+const MainLayout = ({ children }) => (
+  <>
+    <Navbar />
+    <div className="flex-1">{children}</div>
+    <Footer />
+  </>
+);
 
 function App() {
   return (
@@ -26,48 +33,50 @@ function App() {
         <ChatProvider>
           <LocationProvider>
             <Router>
-              <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
-                <Navbar />
-                <div className="flex-1">
-                  <Routes>
-                    {/* Public Routes */}
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/signup" element={<SignupPage />} />
-                    <Route path="/onboarding" element={<OnboardingPage />} />
-                    
-                    {/* Protected Routes */}
-                    <Route 
-                      path="/chat" 
-                      element={
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={<LandingPage />} /> {/* LandingPage has its own navbar */}
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/signup" element={<SignupPage />} />
+                  <Route path="/onboarding" element={<OnboardingPage />} />
+
+                  {/* Protected Routes */}
+                  <Route 
+                    path="/chat" 
+                    element={
+                      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
                         <ProtectedRoute>
-                          <ChatPage />
+                          <MainLayout><ChatPage /></MainLayout>
                         </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/dashboard" 
-                      element={
+                      </div>
+                    } 
+                  />
+                  <Route 
+                    path="/dashboard" 
+                    element={
+                      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
                         <ProtectedRoute>
-                          <DashboardPage />
+                          <MainLayout><DashboardPage /></MainLayout>
                         </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/guide" 
-                      element={
+                      </div>
+                    } 
+                  />
+                  <Route 
+                    path="/guide" 
+                    element={
+                      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
                         <ProtectedRoute>
-                          <GuideModePage />
+                          <MainLayout><GuideModePage /></MainLayout>
                         </ProtectedRoute>
-                      } 
-                    />
-                    
-                    {/* Fallback */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
-                </div>
-                <Footer />
-                
+                      </div>
+                    } 
+                  />
+
+                  {/* Fallback */}
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+
+                {/* Toast Notifications */}
                 <Toaster 
                   position="top-right"
                   toastOptions={{
@@ -79,7 +88,6 @@ function App() {
                     },
                   }}
                 />
-              </div>
             </Router>
           </LocationProvider>
         </ChatProvider>

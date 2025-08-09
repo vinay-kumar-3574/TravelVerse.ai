@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { chatService } from '../features/ChatInterface/chatService';
 
 const ChatContext = createContext();
@@ -16,6 +16,33 @@ export const ChatProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentTrip, setCurrentTrip] = useState(null);
   const [familyMembers, setFamilyMembers] = useState([]);
+  const [userMemory, setUserMemory] = useState(null);
+  const [conversationState, setConversationState] = useState({});
+
+  // Load chat history and memory on mount
+  useEffect(() => {
+    const loadChatData = async () => {
+      try {
+        // Load chat history
+        const historyResponse = await chatService.getChatHistory();
+        if (historyResponse.success) {
+          setMessages(historyResponse.data.messages || []);
+          setCurrentTrip(historyResponse.data.tripContext);
+        }
+
+        // Load user memory
+        const memoryResponse = await chatService.getUserMemory();
+        if (memoryResponse.success) {
+          setUserMemory(memoryResponse.data.memory);
+          setConversationState(memoryResponse.data.conversationState || {});
+        }
+      } catch (error) {
+        console.error('Error loading chat data:', error);
+      }
+    };
+
+    loadChatData();
+  }, []);
 
   const sendMessage = useCallback(async (message, options = {}) => {
     try {
@@ -31,10 +58,12 @@ export const ChatProvider = ({ children }) => {
       
       setMessages(prev => [...prev, userMessage]);
 
-      // Send to AI service
+      // Send to AI agent with enhanced context
       const response = await chatService.sendMessage(message, {
         currentTrip,
         familyMembers,
+        userMemory,
+        conversationState,
         ...options,
       });
 
@@ -42,19 +71,29 @@ export const ChatProvider = ({ children }) => {
       const aiMessage = {
         id: Date.now() + 1,
         type: 'ai',
-        content: response.content,
-        data: response.data,
+        content: response.data.response,
+        data: {
+          intent: response.data.intent,
+          entities: response.data.entities,
+          metadata: response.data.metadata,
+          tripData: response.data.metadata?.tripData
+        },
         timestamp: new Date(),
       };
 
       setMessages(prev => [...prev, aiMessage]);
 
       // Update trip data if provided
-      if (response.tripData) {
-        setCurrentTrip(response.tripData);
+      if (response.data.metadata?.tripData) {
+        setCurrentTrip(response.data.metadata.tripData);
       }
 
-      return response;
+      // Update conversation state
+      if (response.data.metadata?.conversationState) {
+        setConversationState(response.data.metadata.conversationState);
+      }
+
+      return response.data;
     } catch (error) {
       console.error('Error sending message:', error);
       
@@ -71,11 +110,18 @@ export const ChatProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentTrip, familyMembers]);
+  }, [currentTrip, familyMembers, userMemory, conversationState]);
 
-  const clearChat = useCallback(() => {
-    setMessages([]);
-    setCurrentTrip(null);
+  const clearChat = useCallback(async () => {
+    try {
+      await chatService.clearChatHistory();
+      setMessages([]);
+      setCurrentTrip(null);
+      setUserMemory(null);
+      setConversationState({});
+    } catch (error) {
+      console.error('Error clearing chat:', error);
+    }
   }, []);
 
   const addFamilyMember = useCallback((member) => {
@@ -94,17 +140,96 @@ export const ChatProvider = ({ children }) => {
     );
   }, []);
 
+  const processMultiTurnConversation = useCallback(async (messages) => {
+    try {
+      const response = await chatService.processMultiTurnConversation(messages);
+      return response.data;
+    } catch (error) {
+      console.error('Error processing multi-turn conversation:', error);
+      throw error;
+    }
+  }, []);
+
+  const getTransportRecommendations = useCallback(async (tripInfo, preferences) => {
+    try {
+      const response = await chatService.getTransportRecommendations(tripInfo, preferences);
+      return response;
+    } catch (error) {
+      console.error('Error getting transport recommendations:', error);
+      throw error;
+    }
+  }, []);
+
+  const getHotelRecommendations = useCallback(async (tripInfo, preferences) => {
+    try {
+      const response = await chatService.getHotelRecommendations(tripInfo, preferences);
+      return response;
+    } catch (error) {
+      console.error('Error getting hotel recommendations:', error);
+      throw error;
+    }
+  }, []);
+
+  const generateItinerary = useCallback(async (tripInfo, days) => {
+    try {
+      const response = await chatService.generateItinerary(tripInfo, days);
+      return response;
+    } catch (error) {
+      console.error('Error generating itinerary:', error);
+      throw error;
+    }
+  }, []);
+
+  const getWeatherInfo = useCallback(async (location, date) => {
+    try {
+      const response = await chatService.getWeatherInfo(location, date);
+      return response;
+    } catch (error) {
+      console.error('Error getting weather info:', error);
+      throw error;
+    }
+  }, []);
+
+  const translateText = useCallback(async (text, targetLanguage) => {
+    try {
+      const response = await chatService.translateText(text, targetLanguage);
+      return response;
+    } catch (error) {
+      console.error('Error translating text:', error);
+      throw error;
+    }
+  }, []);
+
+  const getEmergencyInfo = useCallback(async (location, emergencyType) => {
+    try {
+      const response = await chatService.getEmergencyInfo(location, emergencyType);
+      return response;
+    } catch (error) {
+      console.error('Error getting emergency info:', error);
+      throw error;
+    }
+  }, []);
+
   const value = {
     messages,
     isLoading,
     currentTrip,
     familyMembers,
+    userMemory,
+    conversationState,
     sendMessage,
     clearChat,
     addFamilyMember,
     removeFamilyMember,
     updateFamilyMember,
     setCurrentTrip,
+    processMultiTurnConversation,
+    getTransportRecommendations,
+    getHotelRecommendations,
+    generateItinerary,
+    getWeatherInfo,
+    translateText,
+    getEmergencyInfo,
   };
 
   return (

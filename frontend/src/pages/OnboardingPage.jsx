@@ -84,11 +84,21 @@ const OnboardingPage = () => {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      await updateUser(formData);
-      toast.success('Profile completed successfully!');
-      navigate('/chat');
+      const userData = {
+        fullName: formData.fullName,
+        contactNumber: formData.phone, // <-- This matches backend expectation
+        ...formData
+      };
+      const result = await updateUser(userData);
+      if (result.success) {
+        toast.success('Profile completed successfully!');
+        navigate('/chat');
+      } else {
+        toast.error('Failed to save profile');
+      }
     } catch (error) {
-      toast.error('Failed to save profile');
+      toast.error(error.message || 'Failed to save profile');
+      console.error('Onboarding error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -444,7 +454,7 @@ const OnboardingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 overflow-auto">
       <div className="w-full max-w-2xl">
         {/* Progress Bar */}
         <div className="mb-8">
@@ -513,4 +523,4 @@ const OnboardingPage = () => {
   );
 };
 
-export default OnboardingPage; 
+export default OnboardingPage;

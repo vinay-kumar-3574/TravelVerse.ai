@@ -2,11 +2,25 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
-const connectDB = require('./config/database');
+// Connect to MongoDB directly in server.js
+const connectDB = async () => {
+  try {
+    if (!process.env.MONGODB_URI) {
+      throw new Error('❌ MONGODB_URI is not set in environment variables.');
+    }
 
-// Import routes
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    console.log(`✅ MongoDB Connected`);
+  } catch (error) {
+    console.error('🔥 Database connection error:', error.message);
+    setTimeout(connectDB, 5000); // retry every 5 seconds
+  }
+};
+
+// Import routes (paths are relative to backend/src/)
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const tripRoutes = require('./routes/trip');
@@ -15,7 +29,7 @@ const aiRoutes = require('./routes/ai');
 
 const app = express();
 
-// Connect to MongoDB
+// Connect to DB
 connectDB();
 
 // Security middleware
@@ -23,43 +37,43 @@ app.use(helmet());
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: 'Too many requests from this IP, please try again later.'
 });
 app.use('/api/', limiter);
 
-// CORS configuration
+// CORS
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: 'http://localhost:5173',
   credentials: true
 }));
 
-// Body parsing middleware
+// Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health check endpoint
+// Health check
 app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
+  res.status(200).json({
+    status: 'OK',
     message: 'TravelVerse API is running',
     timestamp: new Date().toISOString()
   });
 });
 
-// API routes
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/trip', tripRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/ai', aiRoutes);
 
-// Error handling middleware
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
-    success: false, 
+  res.status(500).json({
+    success: false,
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
   });
@@ -67,18 +81,15 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use('*', (req, res) => {
-  res.status(404).json({ 
-    success: false, 
-    message: 'Route not found' 
+  res.status(404).json({
+    success: false,
+    message: 'Route not found'
   });
 });
 
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`🚀 TravelVerse Server running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
 });
 
-module.exports = app; 
+module.exports = app;

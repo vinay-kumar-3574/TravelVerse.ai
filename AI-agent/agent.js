@@ -1,4 +1,3 @@
-const OpenAI = require('openai');
 const aiConfig = require('./ai-config');
 const OnboardingAgent = require('./pipelines/onboardingAgent');
 const TripPlanner = require('./pipelines/tripPlanner');
@@ -14,10 +13,6 @@ const MemoryManager = require('./memory/memoryManager');
 
 class TravelVerseAgent {
   constructor() {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-    
     // Initialize all AI pipelines
     this.onboardingAgent = new OnboardingAgent();
     this.tripPlanner = new TripPlanner();
@@ -35,6 +30,13 @@ class TravelVerseAgent {
     
     // Conversation state
     this.conversationState = new Map();
+  }
+
+  /**
+   * Get OpenAI client with lazy initialization
+   */
+  getOpenAIClient() {
+    return aiConfig.getOpenAIClient();
   }
 
   /**
@@ -86,8 +88,9 @@ class TravelVerseAgent {
     
     Consider conversation history and context when analyzing intent.`;
 
-    const response = await this.openai.chat.completions.create({
-      model: aiConfig.model,
+    const openai = this.getOpenAIClient();
+    const response = await openai.chat.completions.create({
+      model: aiConfig.AI_CONFIG.model,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: `Message: "${message}"\n\nConversation History: ${JSON.stringify(memory.recentMessages || [])}` }
@@ -324,8 +327,9 @@ class TravelVerseAgent {
   async handleGeneralChat(userId, message, context) {
     const memory = await this.memoryManager.getUserMemory(userId);
     
-    const response = await this.openai.chat.completions.create({
-      model: aiConfig.model,
+    const openai = this.getOpenAIClient();
+    const response = await openai.chat.completions.create({
+      model: aiConfig.AI_CONFIG.model,
       messages: [
         {
           role: 'system',
@@ -404,8 +408,9 @@ class TravelVerseAgent {
   async generatePersonalizedRecommendations(userId, context) {
     const userContext = await this.getUserContext(userId);
     
-    const response = await this.openai.chat.completions.create({
-      model: aiConfig.model,
+    const openai = this.getOpenAIClient();
+    const response = await openai.chat.completions.create({
+      model: aiConfig.AI_CONFIG.model,
       messages: [
         {
           role: 'system',
@@ -438,8 +443,9 @@ class TravelVerseAgent {
     const flowAnalysis = await this.analyzeConversationFlow(messages, conversationHistory);
     
     // Generate contextual response
-    const response = await this.openai.chat.completions.create({
-      model: aiConfig.model,
+    const openai = this.getOpenAIClient();
+    const response = await openai.chat.completions.create({
+      model: aiConfig.AI_CONFIG.model,
       messages: [
         {
           role: 'system',
@@ -469,8 +475,9 @@ class TravelVerseAgent {
    * Analyze conversation flow for context
    */
   async analyzeConversationFlow(messages, history) {
-    const response = await this.openai.chat.completions.create({
-      model: aiConfig.model,
+    const openai = this.getOpenAIClient();
+    const response = await openai.chat.completions.create({
+      model: aiConfig.AI_CONFIG.model,
       messages: [
         {
           role: 'system',
@@ -494,8 +501,9 @@ class TravelVerseAgent {
   async healthCheck() {
     try {
       // Test OpenAI connection
-      await this.openai.chat.completions.create({
-        model: aiConfig.model,
+      const openai = this.getOpenAIClient();
+      await openai.chat.completions.create({
+        model: aiConfig.AI_CONFIG.model,
         messages: [{ role: 'user', content: 'test' }],
         max_tokens: 5
       });

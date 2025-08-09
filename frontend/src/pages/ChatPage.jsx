@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -34,8 +34,14 @@ const ChatPage = () => {
     navigate('/');
   };
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleToggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex">
+    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 overflow-auto">
       {/* Sidebar */}
       <Sidebar 
         isOpen={isSidebarOpen} 
@@ -165,4 +171,4 @@ const ChatPage = () => {
   );
 };
 
-export default ChatPage; 
+export default ChatPage;

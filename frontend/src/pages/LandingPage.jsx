@@ -1,38 +1,38 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Globe, Users, Shield, Zap, MapPin, Calendar, CreditCard } from 'lucide-react';
+import { ArrowRight, Globe, Users, Shield, Zap, MapPin, Calendar } from 'lucide-react';
 
 const LandingPage = () => {
   const navigate = useNavigate();
 
   const features = [
     {
-      icon: <Globe className="h-6 w-6" />,
+      icon: <Globe className="h-6 w-6 text-white" />,
       title: 'AI-Powered Planning',
       description: 'Intelligent trip planning with personalized recommendations'
     },
     {
-      icon: <Users className="h-6 w-6" />,
+      icon: <Users className="h-6 w-6 text-white" />,
       title: 'Family Management',
       description: 'Add family members and manage group travel seamlessly'
     },
     {
-      icon: <Shield className="h-6 w-6" />,
+      icon: <Shield className="h-6 w-6 text-white" />,
       title: 'Safe & Secure',
       description: 'Your data is protected with enterprise-grade security'
     },
     {
-      icon: <Zap className="h-6 w-6" />,
+      icon: <Zap className="h-6 w-6 text-white" />,
       title: 'Real-time Updates',
       description: 'Get instant notifications about your travel plans'
     },
     {
-      icon: <MapPin className="h-6 w-6" />,
+      icon: <MapPin className="h-6 w-6 text-white" />,
       title: 'GPS Integration',
       description: 'Real-time location tracking and navigation'
     },
     {
-      icon: <Calendar className="h-6 w-6" />,
+      icon: <Calendar className="h-6 w-6 text-white" />,
       title: 'Smart Scheduling',
       description: 'AI-optimized daily itineraries and activities'
     }
@@ -40,13 +40,13 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%239C92AC%22%20fill-opacity%3D%220.1%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
-      
+      {/* Decorative Background */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http://www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%3E%3Cg%20fill%3D%22%239C92AC%22%20fill-opacity%3D%220.08%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+
       {/* Navigation */}
       <nav className="relative z-10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center space-x-2"
@@ -56,19 +56,19 @@ const LandingPage = () => {
             </div>
             <span className="text-2xl font-bold text-white">TravelVerse</span>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center space-x-6"
           >
-            <button 
+            <button
               onClick={() => navigate('/login')}
               className="text-slate-300 hover:text-white transition-colors"
             >
               Login
             </button>
-            <button 
+            <button
               onClick={() => navigate('/signup')}
               className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 transform hover:scale-105"
             >
@@ -79,55 +79,52 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative z-10 px-6 py-20">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-6xl md:text-7xl font-bold text-white mb-6"
+      <div className="relative z-10 px-6 py-20 text-center">
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-6xl md:text-7xl font-bold text-white mb-6"
+        >
+          Build something{' '}
+          <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            Lovable
+          </span>
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto"
+        >
+          Create your perfect travel experience with AI. Plan trips, manage family travel, and explore the world intelligently.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+        >
+          <button
+            onClick={() => navigate('/signup')}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-200 transform hover:scale-105 flex items-center space-x-2"
           >
-            Build something{' '}
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Lovable
-            </span>
-          </motion.h1>
-          
-          <motion.p 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto"
+            <span>Start Planning</span>
+            <ArrowRight className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => navigate('/login')}
+            className="border border-slate-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-slate-800 transition-all duration-200"
           >
-            Create your perfect travel experience by chatting with AI. 
-            Plan trips, manage family travel, and explore the world intelligently.
-          </motion.p>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-          >
-            <button 
-              onClick={() => navigate('/signup')}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-200 transform hover:scale-105 flex items-center space-x-2"
-            >
-              <span>Start Planning</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => navigate('/login')}
-              className="border border-slate-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-slate-800 transition-all duration-200"
-            >
-              Sign In
-            </button>
-          </motion.div>
-        </div>
+            Sign In
+          </button>
+        </motion.div>
       </div>
 
-      {/* Features Section */}
-      <motion.div 
+      {/* Features */}
+      <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
@@ -142,7 +139,7 @@ const LandingPage = () => {
               Experience the future of travel planning with AI-powered assistance
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <motion.div
@@ -167,8 +164,8 @@ const LandingPage = () => {
         </div>
       </motion.div>
 
-      {/* CTA Section */}
-      <motion.div 
+      {/* Call to Action */}
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1 }}
@@ -181,7 +178,7 @@ const LandingPage = () => {
           <p className="text-slate-300 text-lg mb-8">
             Join thousands of travelers who trust TravelVerse for their journey planning
           </p>
-          <button 
+          <button
             onClick={() => navigate('/signup')}
             className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-10 py-4 rounded-xl text-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-200 transform hover:scale-105"
           >
@@ -193,4 +190,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage; 
+export default LandingPage;

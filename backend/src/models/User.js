@@ -21,25 +21,25 @@ const userSchema = new mongoose.Schema({
   },
   dateOfBirth: {
     type: Date,
-    required: true
+    required: false // Will be required during onboarding
   },
   gender: {
     type: String,
     enum: ['male', 'female', 'other'],
-    required: true
+    required: false // Will be required during onboarding
   },
   nationality: {
     type: String,
-    required: true
+    required: false // Will be required during onboarding
   },
   primaryLanguage: {
     type: String,
-    required: true,
+    required: false,
     default: 'English'
   },
   contactNumber: {
     type: String,
-    required: true
+    required: false // Will be required during onboarding
   },
   preferredTravelMode: {
     type: String,

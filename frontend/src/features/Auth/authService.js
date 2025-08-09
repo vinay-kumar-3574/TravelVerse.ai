@@ -36,7 +36,7 @@ export const authService = {
   async login(credentials) {
     try {
       const response = await api.post('/auth/login', credentials);
-      return response.data;
+      return response.data.data; // Return { user, token }
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Login failed');
     }
@@ -46,7 +46,7 @@ export const authService = {
   async signup(userData) {
     try {
       const response = await api.post('/auth/signup', userData);
-      return response.data;
+      return response.data.data; // Return { user, token }
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Registration failed');
     }
@@ -59,6 +59,16 @@ export const authService = {
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to get user data');
+    }
+  },
+
+  // Complete onboarding
+  async completeOnboarding(onboardingData) {
+    try {
+      const response = await api.post('/auth/onboarding', onboardingData);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to complete onboarding');
     }
   },
 

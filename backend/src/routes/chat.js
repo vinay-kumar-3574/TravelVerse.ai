@@ -6,73 +6,162 @@ const aiController = require('../controllers/aiController');
 
 // All chat routes require authentication
 router.use(authenticateToken);
-// Proxy for AI chat POST for frontend compatibility
+
+// Main chat endpoints
 router.post('/send', (req, res) => aiController.processChatMessage(req, res));
-// Optional additional endpoints to align with frontend chatService
-router.post('/generate', (req, res) => aiController.processChatMessage(req, res));
+router.get('/history', (req, res) => aiController.getChatHistory(req, res));
+router.delete('/history', (req, res) => aiController.clearChatHistory(req, res));
+
+// AI agent specific endpoints
+router.get('/memory', (req, res) => aiController.getUserMemory(req, res));
+router.post('/multi-turn', (req, res) => aiController.processMultiTurnConversation(req, res));
+
+// Enhanced AI-powered endpoints (replacing stubs)
 router.post('/transport', async (req, res) => {
-  // simple stub using ai to suggest
-  return res.status(200).json({ success: true, recommendations: [{ mode: 'flight', reason: 'Fastest for long distance', estimate: 8000 }] });
-});
-router.post('/hotels', async (req, res) => {
-  return res.status(200).json({ success: true, hotels: [{ name: 'City Inn', pricePerNight: 2500, rating: 4.2 }] });
-});
-router.post('/itinerary', async (req, res) => {
-  return res.status(200).json({ success: true, itinerary: [{ time: '09:00', activity: 'Breakfast' }] });
-});
-router.post('/weather', async (req, res) => {
-  return res.status(200).json({ success: true, weather: { temperature: 28, condition: 'Sunny', humidity: 65, windSpeed: 12 } });
-});
-router.post('/translate', async (req, res) => {
-  const { text, targetLanguage } = req.body;
-  return res.status(200).json({ success: true, translated: `[${targetLanguage}] ${text}` });
-});
-router.post('/emergency', async (req, res) => {
-  return res.status(200).json({ success: true, message: 'Emergency services notified (simulated).' });
-});
-
-// Get chat history for user
-router.get('/history', async (req, res) => {
   try {
-    const chat = await Chat.findOne({ 
-      userId: req.user.id, 
-      isActive: true 
-    });
-
+    const { tripInfo, preferences } = req.body;
+    
+    // Use AI agent to get transport recommendations
+    const response = await aiController.aiAgent.handleTransport(
+      req.user.id, 
+      `Recommend transport for trip from ${tripInfo.source} to ${tripInfo.destination}`,
+      { tripInfo, preferences }
+    );
+    
     res.status(200).json({
       success: true,
-      data: {
-        messages: chat ? chat.messages : [],
-        chatId: chat ? chat._id : null
-      }
+      recommendations: response.metadata?.recommendations || [],
+      reasoning: response.content
     });
   } catch (error) {
-    console.error('Get chat history error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get chat history',
+      message: 'Failed to get transport recommendations',
       error: error.message
     });
   }
 });
 
-// Clear chat history
-router.delete('/history', async (req, res) => {
+router.post('/hotels', async (req, res) => {
   try {
-    await Chat.updateMany(
-      { userId: req.user.id },
-      { isActive: false }
+    const { tripInfo, preferences } = req.body;
+    
+    // Use AI agent to get hotel recommendations
+    const response = await aiController.aiAgent.handleHotel(
+      req.user.id,
+      `Recommend hotels for trip to ${tripInfo.destination}`,
+      { tripInfo, preferences }
     );
-
+    
     res.status(200).json({
       success: true,
-      message: 'Chat history cleared successfully'
+      hotels: response.metadata?.hotels || [],
+      reasoning: response.content
     });
   } catch (error) {
-    console.error('Clear chat history error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to clear chat history',
+      message: 'Failed to get hotel recommendations',
+      error: error.message
+    });
+  }
+});
+
+router.post('/itinerary', async (req, res) => {
+  try {
+    const { tripInfo, days = 1 } = req.body;
+    
+    // Use AI agent to generate itinerary
+    const response = await aiController.aiAgent.handleTripPlanning(
+      req.user.id,
+      `Create a ${days}-day itinerary for trip to ${tripInfo.destination}`,
+      { tripInfo, days }
+    );
+    
+    res.status(200).json({
+      success: true,
+      itinerary: response.metadata?.itinerary || [],
+      content: response.content
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to generate itinerary',
+      error: error.message
+    });
+  }
+});
+
+router.post('/weather', async (req, res) => {
+  try {
+    const { location, date } = req.body;
+    
+    // Use AI agent to get weather information
+    const response = await aiController.aiAgent.handleDashboard(
+      req.user.id,
+      `Get weather information for ${location} on ${date}`,
+      { location, date }
+    );
+    
+    res.status(200).json({
+      success: true,
+      weather: response.metadata?.weather || {},
+      content: response.content
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get weather information',
+      error: error.message
+    });
+  }
+});
+
+router.post('/translate', async (req, res) => {
+  try {
+    const { text, targetLanguage } = req.body;
+    
+    // Use AI agent for translation
+    const response = await aiController.aiAgent.handleTranslation(
+      req.user.id,
+      `Translate "${text}" to ${targetLanguage}`,
+      { text, targetLanguage }
+    );
+    
+    res.status(200).json({
+      success: true,
+      translated: response.metadata?.translated || text,
+      content: response.content
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to translate text',
+      error: error.message
+    });
+  }
+});
+
+router.post('/emergency', async (req, res) => {
+  try {
+    const { location, emergencyType } = req.body;
+    
+    // Use AI agent for emergency assistance
+    const response = await aiController.aiAgent.handleSOS(
+      req.user.id,
+      `Emergency assistance needed: ${emergencyType} in ${location}`,
+      { location, emergencyType }
+    );
+    
+    res.status(200).json({
+      success: true,
+      assistance: response.metadata?.assistance || {},
+      content: response.content
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to process emergency request',
       error: error.message
     });
   }

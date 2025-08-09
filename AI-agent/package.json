@@ -1,0 +1,16 @@
+{
+  "name": "travelverse-ai-agent",
+  "version": "1.0.0",
+  "description": "AI Agent for TravelVerse",
+  "main": "agent.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "openai": "^4.0.0",
+    "dotenv": "^16.3.1"
+  },
+  "keywords": ["ai", "travel", "assistant"],
+  "author": "TravelVerse Team",
+  "license": "MIT"
+}

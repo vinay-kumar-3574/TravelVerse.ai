@@ -67,8 +67,16 @@ export const AuthProvider = ({ children }) => {
     setError(null);
   };
 
-  const updateUser = (updatedUser) => {
-    setUser(updatedUser);
+  const updateUser = async (userData) => {
+    try {
+      setError(null);
+      const response = await authService.completeOnboarding(userData);
+      setUser(response.data.user);
+      return { success: true };
+    } catch (err) {
+      setError(err.message);
+      throw new Error(err.message);
+    }
   };
 
   const value = {

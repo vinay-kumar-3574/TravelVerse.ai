@@ -1,0 +1,20 @@
+{
+  "userId": "test-user-123",
+  "conversations": [
+    {
+      "message": "I want to plan a trip from Chennai to Dubai with 4 people and 10,000 INR budget",
+      "response": "Great! I can help you plan your trip. I've identified:\n- Source: Chennai\n- Destination: plan a trip from Chennai to Dubai\n- Budget: 10000 INR\n- Travelers: 4\n\nWould you like me to help you with transport options, accommodation, or create a detailed itinerary?",
+      "intent": "trip_planning",
+      "entities": {
+        "source": "Chennai",
+        "destination": "plan a trip from Chennai to Dubai",
+        "budget": "10000",
+        "travelers": 4
+      },
+      "timestamp": "2025-08-08T11:31:00.668Z"
+    }
+  ],
+  "preferences": {},
+  "trips": [],
+  "lastUpdated": "2025-08-08T11:31:00.669Z"
+}

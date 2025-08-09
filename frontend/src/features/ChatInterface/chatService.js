@@ -20,13 +20,13 @@ api.interceptors.request.use((config) => {
 });
 
 export const chatService = {
-  // Send message to AI and get response
+  // Send message to AI agent and get response
   async sendMessage(message, options = {}) {
     try {
       const response = await api.post('/chat/send', {
         message,
         currentTrip: options.currentTrip,
-        familyMembers: options.familyMembers,
+        familyMembers: options.familyMembers || [],
         context: options.context,
       });
       
@@ -36,9 +36,66 @@ export const chatService = {
     }
   },
 
-  // Parse trip information from user message
-  parseTripInfo(message) {
-    // This is a simplified parser - in production, you'd use more sophisticated NLP
+  // Get chat history with AI memory
+  async getChatHistory() {
+    try {
+      const response = await api.get('/chat/history');
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to get chat history');
+    }
+  },
+
+  // Clear chat history and AI memory
+  async clearChatHistory() {
+    try {
+      const response = await api.delete('/chat/history');
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to clear chat history');
+    }
+  },
+
+  // Get user's AI memory and context
+  async getUserMemory() {
+    try {
+      const response = await api.get('/chat/memory');
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to get user memory');
+    }
+  },
+
+  // Process multi-turn conversation
+  async processMultiTurnConversation(messages) {
+    try {
+      const response = await api.post('/chat/multi-turn', {
+        messages
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to process multi-turn conversation');
+    }
+  },
+
+  // Parse trip information from user message (enhanced with AI)
+  async parseTripInfo(message) {
+    try {
+      // Use AI agent to parse trip information
+      const response = await api.post('/chat/send', {
+        message: `Parse trip information from: ${message}`,
+        context: { parseOnly: true }
+      });
+      
+      return response.data.entities || {};
+    } catch (error) {
+      // Fallback to basic parsing
+      return this.basicTripInfoParser(message);
+    }
+  },
+
+  // Basic trip info parser (fallback)
+  basicTripInfoParser(message) {
     const tripInfo = {
       source: null,
       destination: null,
@@ -83,31 +140,12 @@ export const chatService = {
     return tripInfo;
   },
 
-  // Generate AI response based on message type
-  async generateResponse(message, tripInfo, familyMembers = []) {
-    try {
-      const response = await api.post('/chat/generate', {
-        message,
-        tripInfo,
-        familyMembers,
-        timestamp: new Date().toISOString(),
-      });
-      
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to generate response');
-    }
-  },
-
-  // Get transport recommendations
-  async getTransportRecommendations(tripInfo) {
+  // Get transport recommendations using AI agent
+  async getTransportRecommendations(tripInfo, preferences = {}) {
     try {
       const response = await api.post('/chat/transport', {
-        source: tripInfo.source,
-        destination: tripInfo.destination,
-        members: tripInfo.members,
-        budget: tripInfo.budget,
-        preferences: tripInfo.preferences,
+        tripInfo,
+        preferences
       });
       
       return response.data;
@@ -116,15 +154,12 @@ export const chatService = {
     }
   },
 
-  // Get hotel recommendations
-  async getHotelRecommendations(tripInfo) {
+  // Get hotel recommendations using AI agent
+  async getHotelRecommendations(tripInfo, preferences = {}) {
     try {
       const response = await api.post('/chat/hotels', {
-        destination: tripInfo.destination,
-        members: tripInfo.members,
-        budget: tripInfo.budget,
-        dates: tripInfo.dates,
-        preferences: tripInfo.preferences,
+        tripInfo,
+        preferences
       });
       
       return response.data;
@@ -133,15 +168,12 @@ export const chatService = {
     }
   },
 
-  // Generate daily itinerary
+  // Generate itinerary using AI agent
   async generateItinerary(tripInfo, days = 1) {
     try {
       const response = await api.post('/chat/itinerary', {
-        destination: tripInfo.destination,
-        days,
-        members: tripInfo.members,
-        budget: tripInfo.budget,
-        preferences: tripInfo.preferences,
+        tripInfo,
+        days
       });
       
       return response.data;
@@ -150,12 +182,12 @@ export const chatService = {
     }
   },
 
-  // Get weather information
+  // Get weather information using AI agent
   async getWeatherInfo(location, date) {
     try {
       const response = await api.post('/chat/weather', {
         location,
-        date,
+        date
       });
       
       return response.data;
@@ -164,12 +196,12 @@ export const chatService = {
     }
   },
 
-  // Translate text
+  // Translate text using AI agent
   async translateText(text, targetLanguage) {
     try {
       const response = await api.post('/chat/translate', {
         text,
-        targetLanguage,
+        targetLanguage
       });
       
       return response.data;
@@ -178,11 +210,12 @@ export const chatService = {
     }
   },
 
-  // Get emergency information
-  async getEmergencyInfo(location) {
+  // Get emergency assistance using AI agent
+  async getEmergencyInfo(location, emergencyType = 'general') {
     try {
       const response = await api.post('/chat/emergency', {
         location,
+        emergencyType
       });
       
       return response.data;
@@ -191,7 +224,7 @@ export const chatService = {
     }
   },
 
-  // Save trip to user's account
+  // Save trip to database
   async saveTrip(tripData) {
     try {
       const response = await api.post('/trips', tripData);
@@ -201,7 +234,7 @@ export const chatService = {
     }
   },
 
-  // Get user's saved trips
+  // Get saved trips
   async getSavedTrips() {
     try {
       const response = await api.get('/trips');
@@ -229,5 +262,5 @@ export const chatService = {
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to delete trip');
     }
-  },
+  }
 }; 

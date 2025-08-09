@@ -1,13 +1,23 @@
 const OpenAI = require('openai');
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization of OpenAI client
+let openai = null;
+
+const getOpenAIClient = () => {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY environment variable is required');
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+};
 
 // AI Configuration
 const AI_CONFIG = {
-  model: 'gpt-4-1106-preview', // Using GPT-4.1-mini equivalent
+  model: 'gpt-3.5-turbo', 
   maxTokens: 2000,
   temperature: 0.7,
   topP: 1,
@@ -37,9 +47,10 @@ const SYSTEM_PROMPTS = {
 // Helper function to create chat completion
 const createChatCompletion = async (messages, context = 'tripPlanner') => {
   try {
+    const client = getOpenAIClient();
     const systemPrompt = SYSTEM_PROMPTS[context];
     
-    const response = await openai.chat.completions.create({
+    const response = await client.chat.completions.create({
       model: AI_CONFIG.model,
       messages: [
         { role: 'system', content: systemPrompt },
@@ -99,28 +110,50 @@ const extractEntities = async (userInput) => {
   }
 };
 
-// Helper function to generate travel recommendations
+// Helper function to generate personalized recommendations
 const generateRecommendations = async (tripData) => {
   const recommendationPrompt = `
-    Based on this trip data, provide intelligent travel recommendations:
-    - Transport mode (flight/train/bus) with reasoning
-    - Accommodation suggestions
-    - Budget allocation
-    - Travel tips and considerations
+    Based on the following trip data, generate personalized recommendations:
     
-    Trip data: ${JSON.stringify(tripData)}
+    Trip Data: ${JSON.stringify(tripData)}
+    
+    Provide recommendations for:
+    1. Transportation options
+    2. Accommodation suggestions
+    3. Activities and attractions
+    4. Budget optimization
+    5. Travel tips
+    
+    Format the response as a structured JSON object.
   `;
 
-  return await createChatCompletion([
-    { role: 'user', content: recommendationPrompt }
-  ], 'tripPlanner');
+  try {
+    const response = await createChatCompletion([
+      { role: 'user', content: recommendationPrompt }
+    ], 'tripPlanner');
+
+    try {
+      return JSON.parse(response);
+    } catch (parseError) {
+      return {
+        transportation: 'Based on your preferences, I recommend...',
+        accommodation: 'For your budget and group size...',
+        activities: 'Popular attractions include...',
+        budget: 'Estimated costs breakdown...',
+        tips: 'Travel tips and advice...'
+      };
+    }
+  } catch (error) {
+    console.error('Recommendation generation error:', error);
+    return null;
+  }
 };
 
 module.exports = {
-  openai,
   AI_CONFIG,
   SYSTEM_PROMPTS,
   createChatCompletion,
   extractEntities,
-  generateRecommendations
+  generateRecommendations,
+  getOpenAIClient
 }; 
